@@ -3,7 +3,7 @@ const { Post } = require('./models');
 
 const express = require('express')
 const app = express()
-const port = 3000;
+const port = 3001;
 
 app.set('view engine', 'ejs');
 app.use(express.json());
