@@ -1,5 +1,6 @@
-const { Sequelize } = require('sequelize');
+const sequelize = require('sequelize');
 const { Post } = require('./models');
+
 
 const express = require('express')
 const app = express()
@@ -9,9 +10,7 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
+
 
 app.post('/newPost', async (req, res) => {
     const { title, contents, category } = req.body;
@@ -25,15 +24,20 @@ app.post('/newPost', async (req, res) => {
     });
 })
 
-app.get('/allposts', async (req, res) => {
+app.get('/allPosts', async (req, res) => {
     const posts = await Post.findAll();
     res.json(posts);
 })
 
-app.get('/posts/:id', async (req, res) => {
+app.get('/posts/:title', async (req, res) => {
     try {
-        const postById = await Post.findByPk(req.params.id);
-        res.json(postById);
+        const postByTitle = await Post.findOne({
+            where: {
+                title: sequelize.where(sequelize.fn('LOWER', sequelize.col('title')), 'LIKE', '%' + req.params.title.toLowerCase() + '%')
+
+            }
+        });
+        res.json(postByTitle);
     } catch (e) {
         console.log(e);
         res.status(404).json({
@@ -44,9 +48,9 @@ app.get('/posts/:id', async (req, res) => {
 
 })
 
-app.get('/posts/by-category', async (req, res) => {
+app.get('/posts/title', async (req, res) => {
     const posts = await Post.findAll({
-        attributes: ['category']
+        attributes: ['title']
     });
     res.json(posts);
 })
